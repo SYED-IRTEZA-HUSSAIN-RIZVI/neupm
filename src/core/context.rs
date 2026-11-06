@@ -6,6 +6,7 @@ pub struct ExecutionContext {
     pub working_dir: PathBuf,
     pub node_modules_dir: PathBuf,
     pub manifest_path: PathBuf,
+    pub lockfile_path: PathBuf,
 }
 
 impl Default for ExecutionContext {
@@ -18,10 +19,12 @@ impl ExecutionContext {
     pub fn new(working_dir: PathBuf) -> Self {
         let node_modules_dir = working_dir.join("node_modules");
         let manifest_path = working_dir.join("package.json");
+        let lockfile_path = working_dir.join("neupm-lock.json");
         Self {
             working_dir,
             node_modules_dir,
             manifest_path,
+            lockfile_path,
         }
     }
 
@@ -31,5 +34,9 @@ impl ExecutionContext {
 
     pub fn manifest(&self) -> &Path {
         &self.manifest_path
+    }
+
+    pub fn lockfile(&self) -> &Path {
+        &self.lockfile_path
     }
 }

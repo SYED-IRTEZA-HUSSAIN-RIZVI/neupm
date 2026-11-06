@@ -15,32 +15,32 @@ pub async fn run(cli: Cli) -> Result<()> {
             commands::add::execute_add(&package, context).await?;
         }
 
-        Some(Commands::Install) => {
-            commands::install::execute_install().await?;
+        Some(Commands::Install { frozen_lockfile }) => {
+            commands::install::execute_install(frozen_lockfile, context).await?;
         }
 
         Some(Commands::Remove { package }) => {
-            commands::remove::execute_remove(&package).await?;
+            commands::remove::execute_remove(&package, context).await?;
         }
 
         Some(Commands::Update) => {
-            commands::update::execute_update().await?;
+            commands::update::execute_update(context).await?;
         }
 
         Some(Commands::Init) => {
-            commands::init::execute_init().await?;
+            commands::init::execute_init(context).await?;
         }
 
         Some(Commands::Doctor) => {
-            commands::doctor::execute_doctor().await?;
+            commands::doctor::execute_doctor(context).await?;
         }
 
         Some(Commands::Audit) => {
-            commands::audit::execute_audit().await?;
+            commands::audit::execute_audit(context).await?;
         }
 
         Some(Commands::List) => {
-            commands::list::execute_list().await?;
+            commands::list::execute_list(context).await?;
         }
 
         None => {

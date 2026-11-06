@@ -2,8 +2,9 @@ use anyhow::{Context, Result, bail};
 use reqwest::Client;
 use serde_json::Value;
 
-use super::metadata::parse_npm_metadata;
 use crate::core::package::PackageMetadata;
+use crate::registry::npm::metadata::extract_version_metadata;
+use crate::resolver::version_selector::select_version;
 
 pub const DEFAULT_REGISTRY_URL: &str = "https://registry.npmjs.org";
 
@@ -25,8 +26,26 @@ impl NpmRegistryAdapter {
         }
     }
 
-    /// Resolve package metadata (latest version, tarball URL, integrity) from npm.
-    pub async fn resolve(&self, client: &Client, package: &str) -> Result<PackageMetadata> {
+    /// Resolve package metadata from npm using an optional version requirement.
+    ///
+    /// - `version_req = None` → resolves `latest` dist-tag.
+    /// - `version_req = Some("latest")` → resolves `latest` dist-tag.
+    /// - `version_req = Some("^18.0.0")` → resolves highest matching semver.
+    /// - `version_req = Some("18.3.1")` → resolves exact version.
+    pub async fn resolve(
+        &self,
+        client: &Client,
+        package: &str,
+        version_req: Option<&str>,
+    ) -> Result<PackageMetadata> {
+        let raw = self.resolve_raw(client, package).await?;
+        let version = select_version(&raw, version_req)
+            .with_context(|| format!("Could not resolve version for '{package}'"))?;
+        extract_version_metadata(package, &raw, &version)
+    }
+
+    /// Fetch the raw npm registry JSON for a package (the full metadata document).
+    pub async fn resolve_raw(&self, client: &Client, package: &str) -> Result<Value> {
         let encoded_package = package.replace('/', "%2f");
         let metadata_url = format!("{}/{}", self.registry_url, encoded_package);
 
@@ -44,11 +63,9 @@ impl NpmRegistryAdapter {
             .error_for_status()
             .context("npm registry returned an unsuccessful response")?;
 
-        let metadata: Value = response
+        response
             .json()
             .await
-            .context("Could not parse npm package metadata")?;
-
-        parse_npm_metadata(package, &metadata)
+            .context("Could not parse npm package metadata")
     }
 }

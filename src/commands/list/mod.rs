@@ -1,6 +1,3 @@
-use anyhow::Result;
+pub mod execute;
 
-pub async fn execute_list() -> Result<()> {
-    println!("NEUPM: Package listing is not implemented yet.");
-    Ok(())
-}
+pub use execute::execute_list;

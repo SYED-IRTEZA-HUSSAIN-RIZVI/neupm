@@ -1,6 +1,3 @@
-use anyhow::Result;
+pub mod execute;
 
-pub async fn execute_doctor() -> Result<()> {
-    println!("NEUPM: Environment diagnostics are not implemented yet.");
-    Ok(())
-}
+pub use execute::execute_doctor;

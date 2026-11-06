@@ -48,6 +48,9 @@ fn test_integration_install_package_end_to_end() {
         version: "1.2.3".to_string(),
         tarball_url: "https://example.com/dummy.tgz".to_string(),
         integrity,
+        dependencies: std::collections::HashMap::new(),
+        peer_dependencies: std::collections::HashMap::new(),
+        optional_dependencies: std::collections::HashMap::new(),
     };
 
     let engine = InstallEngine::new(context.clone());

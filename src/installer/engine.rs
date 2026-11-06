@@ -20,8 +20,8 @@ impl InstallEngine {
         Self { context }
     }
 
-    /// Execute the complete staged installation of a package from tarball bytes.
-    pub fn install_package(
+    /// Install package files into `node_modules` without modifying `package.json`.
+    pub fn install_package_files(
         &self,
         package_meta: &PackageMetadata,
         archive_bytes: &[u8],
@@ -61,7 +61,19 @@ impl InstallEngine {
             }
         }
 
-        // 7. Update project package.json after successful installation.
+        Ok(installation_path)
+    }
+
+    /// Execute the complete staged installation of a package from tarball bytes,
+    /// including updating `package.json`.
+    pub fn install_package(
+        &self,
+        package_meta: &PackageMetadata,
+        archive_bytes: &[u8],
+    ) -> Result<PathBuf> {
+        let installation_path = self.install_package_files(package_meta, archive_bytes)?;
+
+        // Update project package.json after successful installation.
         update_dependency_in_manifest(
             self.context.manifest(),
             &package_meta.name,

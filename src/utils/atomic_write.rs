@@ -2,9 +2,9 @@ use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
 
-/// Safely write data to a file by writing to a temporary file first,
-/// then renaming it atomically.
-pub fn atomic_write(target_path: &Path, content: &str) -> Result<()> {
+/// Safely write bytes to a file by writing to a temporary file first,
+/// then renaming it atomically within the same directory.
+pub fn atomic_write(target_path: &Path, content: &[u8]) -> Result<()> {
     let parent = target_path.parent().unwrap_or_else(|| Path::new("."));
 
     let temp_path = parent.join(format!(
@@ -40,10 +40,10 @@ mod tests {
         let dir = tempdir().unwrap();
         let target = dir.path().join("test.json");
 
-        atomic_write(&target, "{\"initial\":true}").unwrap();
+        atomic_write(&target, b"{\"initial\":true}").unwrap();
         assert_eq!(fs::read_to_string(&target).unwrap(), "{\"initial\":true}");
 
-        atomic_write(&target, "{\"updated\":true}").unwrap();
+        atomic_write(&target, b"{\"updated\":true}").unwrap();
         assert_eq!(fs::read_to_string(&target).unwrap(), "{\"updated\":true}");
     }
 }

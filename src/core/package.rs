@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// Metadata resolved from a package registry.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageMetadata {
@@ -5,6 +7,12 @@ pub struct PackageMetadata {
     pub version: String,
     pub tarball_url: String,
     pub integrity: String,
+    /// Runtime dependencies declared in the resolved version's package.json.
+    pub dependencies: HashMap<String, String>,
+    /// Peer dependencies (informational; handled separately).
+    pub peer_dependencies: HashMap<String, String>,
+    /// Optional dependencies (failure tolerated).
+    pub optional_dependencies: HashMap<String, String>,
 }
 
 /// Package specification for installation requests.
@@ -17,8 +25,8 @@ pub struct PackageSpec {
 impl PackageSpec {
     pub fn parse(spec: &str) -> Self {
         // Handle scoped packages like @types/node@^26.0.0
-        if spec.starts_with('@') {
-            if let Some(idx) = spec[1..].find('@') {
+        if let Some(rest) = spec.strip_prefix('@') {
+            if let Some(idx) = rest.find('@') {
                 let name = &spec[..idx + 1];
                 let version = &spec[idx + 2..];
                 return Self {

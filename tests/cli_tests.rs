@@ -31,7 +31,17 @@ fn test_cli_parsing_subcommands() {
         Cli::try_parse_from(vec!["neupm", "install"])
             .unwrap()
             .command,
-        Some(Commands::Install)
+        Some(Commands::Install {
+            frozen_lockfile: false
+        })
+    );
+    assert_eq!(
+        Cli::try_parse_from(vec!["neupm", "install", "--frozen-lockfile"])
+            .unwrap()
+            .command,
+        Some(Commands::Install {
+            frozen_lockfile: true
+        })
     );
     assert_eq!(
         Cli::try_parse_from(vec!["neupm", "doctor"])

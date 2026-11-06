@@ -1,6 +1,3 @@
-use anyhow::Result;
+pub mod execute;
 
-pub async fn execute_install() -> Result<()> {
-    println!("NEUPM: Install engine is not implemented yet.");
-    Ok(())
-}
+pub use execute::execute_install;

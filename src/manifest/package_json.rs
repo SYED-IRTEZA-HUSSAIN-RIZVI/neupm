@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, bail};
 use serde_json::{Value, json};
+use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
@@ -42,6 +43,36 @@ impl PackageJson {
             self.raw["dependencies"] = json!({});
         }
         self.raw["dependencies"][package] = json!(version_constraint);
+    }
+
+    /// Remove a dependency by name. Returns `true` if it was present.
+    pub fn remove_dependency(&mut self, package: &str) -> bool {
+        if let Some(deps) = self.raw["dependencies"].as_object_mut() {
+            deps.remove(package).is_some()
+        } else {
+            false
+        }
+    }
+
+    /// Return the declared `dependencies` as a map of name → version range.
+    pub fn dependencies(&self) -> HashMap<String, String> {
+        match self.raw["dependencies"].as_object() {
+            Some(obj) => obj
+                .iter()
+                .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
+                .collect(),
+            None => HashMap::new(),
+        }
+    }
+
+    /// Return the project name from package.json, if present.
+    pub fn name(&self) -> Option<&str> {
+        self.raw["name"].as_str()
+    }
+
+    /// Return the project version from package.json, if present.
+    pub fn version(&self) -> Option<&str> {
+        self.raw["version"].as_str()
     }
 
     /// Render formatted JSON with a trailing newline.

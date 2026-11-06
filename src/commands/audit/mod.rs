@@ -1,6 +1,3 @@
-use anyhow::Result;
+pub mod execute;
 
-pub async fn execute_audit() -> Result<()> {
-    println!("NEUPM: Security auditing is not implemented yet.");
-    Ok(())
-}
+pub use execute::execute_audit;
