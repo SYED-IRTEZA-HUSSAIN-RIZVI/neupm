@@ -5,9 +5,7 @@ use std::path::Path;
 /// Safely write data to a file by writing to a temporary file first,
 /// then renaming it atomically.
 pub fn atomic_write(target_path: &Path, content: &str) -> Result<()> {
-    let parent = target_path
-        .parent()
-        .unwrap_or_else(|| Path::new("."));
+    let parent = target_path.parent().unwrap_or_else(|| Path::new("."));
 
     let temp_path = parent.join(format!(
         ".{}.tmp-{}",
