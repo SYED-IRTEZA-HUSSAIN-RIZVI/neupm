@@ -1,8 +1,6 @@
 <div align="center">
   <img src="assets/logo.png" alt="NEUPM Logo" width="440" />
 
-  <h1>NEUPM</h1>
-
   <h3>The Next-Generation Node.js Package Manager</h3>
 
   <p>A Rust-powered package manager designed for the modern Node.js ecosystem.</p>
